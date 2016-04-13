@@ -43,17 +43,33 @@ func main(){
     }            
 }
 
-func readM3uPlaylist(data string) (songs []Song) {
+func readPlaylist(data string, fromM3U bool) (songs []Song) {
     var song Song
     for _, line := range strings.Split(data, "\n") {
         line = strings.TrimSpace(line)
-        if line =="" || line == "#EXTM3U" {
+        if line =="" || line == "#EXTM3U" || line == "[playlist]" {
             continue
         }
-        if strings.HasPrefix(line, "#EXTINF:"){
-            song.Title, song.Seconds = parseExtInfLine(line)
+        if fromM3U {
+            if strings.HasPrefix(line, "#EXTINF:"){
+                song.Title, song.Seconds = parseExtInfLine(line)
+            } else {
+                song.Filename = strings.Map(platformDir, line)
+            }
         } else {
-            song.Filename = strings.Map(platformDir, line)
+            if strings.HasPrefix(line, "File") {
+                song.Filename = strings.Map(platformDir, readPlsLine(line))
+            } else if strings.HasPrefix(line, "Title") {
+                song.Title = readPlsLine(line)
+            } else if strings.HasPrefix(line, "Length") {
+                temp := readPlsLine(line)
+                if seconds , err := strconv.Atoi(temp); err != nil {
+                    log.Printf("failed to read the duration: %v\n", err )
+                    temp = -1
+                } else {
+                song.Seconds = seconds
+                }
+            }
         }
         if song.Filename != "" && song.Seconds != 0 && song.Title != "" {
             songs = append(songs, song)
@@ -61,6 +77,13 @@ func readM3uPlaylist(data string) (songs []Song) {
         }
     }
     return songs
+}
+
+func readPlsLine(line){
+    if i:=strings.Index(line, '='); i>-1 {
+        return line[i+1:]
+    } 
+    return ""
 }
 
 func parseExtInfLine(line string) (title string, seconds int) {
