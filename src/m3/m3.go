@@ -30,18 +30,17 @@ func main(){
         fmt.Printf("usage: %s <file.[pls|m3u]>\n", filepath.Base(os.Args[0]))
         os.Exit(1)
     }
-    filename:=os.Args[1]
-    if rawBytes, err := ioutil.ReadFile(filename); err != nil {
+    if rawBytes, err := ioutil.ReadFile(os.Args[1]); err != nil {
         log.Fatal(err)
     } else {
-        if strings.HasSuffix(filename, ".m3u") {
-            songs := readM3uPlaylist(string(rawBytes))
+        fromM3U := strings.HasSuffix(os.Args[1], ".m3u")
+        songs := readPlaylist(string(rawBytes), fromM3U)
+        if fromM3U {
             writePlsPlaylist(songs)
         } else {
-            songs := readPlsPlaylist(string(rawBytes))
             writeM3uPlaylist(songs)
-        }            
-    }
+        }
+    }            
 }
 
 func readM3uPlaylist(data string) (songs []Song) {
