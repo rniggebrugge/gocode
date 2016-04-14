@@ -26,6 +26,10 @@ func (song Song) AsM3u() string {
 }
 
 func main(){
+  
+    b:= "Remco"
+    a:= []rune(b)
+    fmt.Printf("a=%v(%T); b=%v(%T) \n",a,a,b,b)
     if len(os.Args) == 1 || (!strings.HasSuffix(os.Args[1],".m3u") && !strings.HasSuffix(os.Args[1],".pls")){
         fmt.Printf("usage: %s <file.[pls|m3u]>\n", filepath.Base(os.Args[0]))
         os.Exit(1)
@@ -40,7 +44,7 @@ func main(){
         } else {
             writeM3uPlaylist(songs)
         }
-    }            
+    }
 }
 
 func readPlaylist(data string, fromM3U bool) (songs []Song) {
@@ -82,7 +86,7 @@ func readPlaylist(data string, fromM3U bool) (songs []Song) {
 func readPlsLine(line string) string {
     if i:=strings.Index(line, "="); i>-1 {
         return line[i+1:]
-    } 
+    }
     return ""
 }
 
