@@ -65,9 +65,9 @@ func readPlaylist(data string, fromM3U bool) (songs []Song) {
                 temp := readPlsLine(line)
                 if seconds , err := strconv.Atoi(temp); err != nil {
                     log.Printf("failed to read the duration: %v\n", err )
-                    temp = -1
+                    song.Seconds = -1
                 } else {
-                song.Seconds = seconds
+                    song.Seconds = seconds
                 }
             }
         }
@@ -79,8 +79,8 @@ func readPlaylist(data string, fromM3U bool) (songs []Song) {
     return songs
 }
 
-func readPlsLine(line){
-    if i:=strings.Index(line, '='); i>-1 {
+func readPlsLine(line string) string {
+    if i:=strings.Index(line, "="); i>-1 {
         return line[i+1:]
     } 
     return ""
@@ -117,6 +117,13 @@ func writePlsPlaylist(songs []Song){
     }
     fmt.Printf("NumberOfEntries=%d\nVersion=2\n", len(songs))
 }
-    
+
+func writeM3uPlaylist(songs []Song){
+    fmt.Println("#EXTM3U")
+    for _, song := range songs {
+        fmt.Println(song.AsM3u())
+    }
+}
+
     
 
